@@ -1,4 +1,6 @@
-﻿Console.WriteLine("Hello!");
+﻿using System;
+
+Console.WriteLine("Hello!");
 
 var todoList = new List<string>();
 bool exitLoop = false;
@@ -34,36 +36,6 @@ do
 
 Console.ReadKey();
 
-void RemoveFromList(List<string> todoList)
-{
-    PrintList(todoList);
-    Console.WriteLine("Which item you want to remove ?");
-
-    bool validNumber = false;
-    int index;
-    bool validIndex = false;
-
-    do
-    {
-        Console.WriteLine("Insert valid index number !");
-        var output = Console.ReadLine();
-
-        validNumber = int.TryParse(output, out index);
-
-        if (index <= todoList.Count && index > 0)
-        {
-            Console.WriteLine("Index is valid !");
-            todoList.RemoveAt(index - 1);
-            validIndex = true;
-        }
-        else
-        {
-            Console.WriteLine("Index is invalid !");
-        }
-
-    } while (validIndex == false || validNumber == false);
-
-}
 void PrintList(List<string> todoList)
 {
     Console.Clear();
@@ -71,51 +43,92 @@ void PrintList(List<string> todoList)
     if (todoList.Count == 0)
     {
         Console.WriteLine("List is empty !");
+        return;
     }
-    else
-    {
-        Console.WriteLine("Imprimindo a lista !");
-        Console.WriteLine("=======================");
 
-        int index = 1;
-        foreach (string item in todoList)
-        {
-            Console.WriteLine($"{index}. {item}");
-            index++;
-        }
-        Console.WriteLine("======================");
+    Console.WriteLine("Imprimindo a lista !");
+    Console.WriteLine("=======================");
+
+    for (int i = 0; i < todoList.Count; i++)
+    {
+        Console.WriteLine($"{i + 1}. {todoList[i]}");
     }
+    Console.WriteLine("======================");
+
+}
+void RemoveFromList(List<string> todoList)
+{
+    if (todoList.Count == 0)
+    {
+        Console.WriteLine("List is empty ! There is nothing to remove !");
+        return;
+    }
+    PrintList(todoList);
+
+    int index;
+    do
+    {
+        Console.WriteLine("Insert valid index number to remove !");
+    } while (!ValidateIndex(out index));
+
+    var correctIndex = index - 1;
+    var removedItem = todoList[correctIndex];
+    todoList.RemoveAt(index - 1);
+
+    Console.WriteLine($"{removedItem} was removed from the list !");
+
 }
 void AddItemToList(List<string> todoList)
 {
-    bool validDescription = false;
+    string userInput;
 
     do
     {
         Console.WriteLine("Enter the TODO description");
-        var userInput = Console.ReadLine();
+        userInput = Console.ReadLine();
+    } while (!ValidateDescriptionInput(userInput));
 
-        if (todoList.Contains(userInput))
-        {
-            Console.WriteLine("Description must be unique !");
-        }
-        else if (userInput == "")
-        {
-            Console.WriteLine("Description cannot be empty !");
-        }
-        else
-        {
-            validDescription = true;
-            todoList.Add(userInput);
-        }
+    todoList.Add(userInput);
 
-    } while (!validDescription);
 }
-static void PrintOptions()
+void PrintOptions()
 {
     Console.WriteLine("What do you want to do ?");
     Console.WriteLine("[S]ee all TODOs");
     Console.WriteLine("[A]dd a TODO");
     Console.WriteLine("[R]emove a TODO");
     Console.WriteLine("[E]xit");
+}
+bool ValidateDescriptionInput(string userInput)
+{
+
+    if (todoList.Contains(userInput))
+    {
+        Console.WriteLine("Description must be unique !");
+        return false;
+    }
+    if (userInput == "")
+    {
+        Console.WriteLine("Description cannot be empty !");
+        return false;
+    }
+
+    return true;
+}
+bool ValidateIndex(out int index)
+{
+    var output = Console.ReadLine();
+
+    if (
+                int.TryParse(output, out index) &&
+                index <= todoList.Count
+                && index > 0)
+    {
+        Console.WriteLine("Index is valid !");
+        return true;
+    }
+
+
+    Console.WriteLine("Index is invalid !");
+    return false;
 }
